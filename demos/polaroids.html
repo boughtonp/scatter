@@ -1,0 +1,83 @@
+<!-- Scatter v0.1 | (c) Peter Boughton | License: LGPLv3 | https://www.sorcerersisle.com/software/scatter -->
+<!doctype html><meta charset=utf-8 />
+<title>Polaroids Scatter Demo</title>
+
+<h1>Polaroids Scatter Demo</h1>
+<p>A collection of polaroids with captions, all options on default.
+
+<p><i>(View source to see markup, script and CSS used.)</i>
+<script src="../scatter.js"></script>
+
+
+<style>
+	body
+	{
+		font-family:sans-serif;
+		background:#CCC;
+	}
+
+	.gallery
+	{
+		width:80%;
+		height:600px;
+		display:block;
+		background:#DDD;
+		border: solid 1px black;
+		overflow:hidden;
+	}
+
+	.polaroid
+	{
+		background:#FCFCFC;
+		color:black;
+		width:181px;
+		height:219px;
+		padding:10px;
+		padding-top:16px;
+
+		box-shadow: 0 0 3px rgba(0,0,0,0.8);
+		cursor:pointer;
+		transition: 0.3s;
+	}
+
+	.polaroid.selected
+	{
+		box-shadow: 0 0 5px rgba(50,50,50,0.5);
+		cursor:default;
+	}
+
+	.polaroid img
+	{
+		display:block;
+		background:black;
+		width: 181px;
+		height:181px;
+		margin: auto;
+	}
+
+	.polaroid figcaption
+	{
+		text-align:center;
+		margin:1em;
+	}
+</style>
+
+
+<div class="gallery">
+	<figure class="polaroid"><img /><figcaption>image 1</figcaption></figure>
+	<figure class="polaroid"><img /><figcaption>image 2</figcaption></figure>
+	<figure class="polaroid"><img /><figcaption>image 3</figcaption></figure>
+	<figure class="polaroid"><img /><figcaption>image 4</figcaption></figure>
+	<figure class="polaroid"><img /><figcaption>image 5</figcaption></figure>
+	<figure class="polaroid"><img /><figcaption>image 6</figcaption></figure>
+	<figure class="polaroid"><img /><figcaption>image 7</figcaption></figure>
+	<figure class="polaroid"><img /><figcaption>image 8</figcaption></figure>
+	<figure class="polaroid"><img /><figcaption>image 9</figcaption></figure>
+	<figure class="polaroid"><img /><figcaption>image 10</figcaption></figure>
+</div>
+
+
+<script>
+	var PolaroidScatter = new Scatter('.gallery');
+	PolaroidScatter.arrange();
+</script>

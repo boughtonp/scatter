@@ -1,0 +1,119 @@
+<!-- Scatter v0.1 | (c) Peter Boughton | License: LGPLv3 | https://www.sorcerersisle.com/software/scatter -->
+<!doctype html><meta charset=utf-8 />
+<title>Stars Scatter Demo</title>
+
+<h1>Stars Scatter Demo</h1>
+<p>Defaults to random mode, but uses fixed mode to display stars in specific positions.
+<p>Each constellation button calls configure to change the FixedPositions option, then arrange to move into place.
+<p>The Shuffle option can still be used with fixed mode - apply the same constellation multiple times and see the stars re-organise.
+
+<p><i>(View source to see markup, script and CSS used.)</i>
+<script src="../scatter.js"></script>
+
+
+<style>
+	body
+	{
+		font-family:sans-serif;
+		background:#CCC;
+	}
+
+	#Sky
+	{
+		display:block;
+		background:black;
+		color:white;
+		width:700px;
+		height:600px;
+	}
+
+	#Sky>.star
+	{
+		transition: 0.3s;
+		color:white;
+	}
+	
+	#StarControls button
+	{
+		border-width: 2px;
+		padding: 0.25em 0.5em;
+		cursor:pointer;
+	}
+</style>
+
+
+<div id="StarControls">
+	<button>Random</button>
+	<button>Gemini</button>
+	<button>Leo</button>
+	<button>Orion</button>
+	<button>Ursa Major</button>
+</div>
+
+<br/>
+
+<div id="Sky"></div>
+
+
+<script>
+	var Sky = document.getElementById('Sky');
+
+	for ( var i=0 ; i<25 ; ++i )
+		Sky.innerHTML += '<div class="star">*</div>';
+
+	var Constellations =
+		{ "Ursa Major":
+			[[50,141],[119,106],[169,116],[232,123],[346,84],[470,50],[560,42]
+			,[259,169],[348,146],[455,103],[507,178],[576,210],[680,197]
+			,[261,239],[305,416],[305,435],[331,284],[434,314],[443,296]
+			]
+		, "Leo":
+			[[512,302],[84,250],[462,166],[236,152],[602,92],[474,105],[233,242]
+			,[188,326],[685,47],[660,105],[571,56],[515,219]
+			]
+		, "Gemini":
+			[[154,87],[109,151],[376,363],[201,263],[347,211],[266,290],[344,425]
+			,[313,56],[184,161],[106,214],[205,359],[433,254],[466,253],[507,237]
+			,[242,120],[410,295],[143,174]
+			]
+		, "Orion":
+			[[149,240],[327,512],[279,258],[248,375],[230,390],[211,403],[233,477]
+			,[179,538],[236,197],[118,200],[281,412],[85,117],[154,15],[113,18]
+			,[366,100],[401,132],[409,191],[428,214],[433,247],[426,270],[414,327],[395,339]
+			]
+		};
+
+	document.getElementById('StarControls').addEventListener('click',showConstellation);
+
+	function showConstellation(event)
+	{
+		if ( event.target.innerText == "Random" )
+		{
+			StarScatter.arrange("random");
+			return;
+		}
+
+		var Constellation = Constellations[event.target.innerText];
+
+		// all children need a position - so add extra off-screen positions to smaller constellations
+		while( Constellation.length < Sky.children.length )
+			Constellation.push([-100,-100]);
+
+		StarScatter.configure({Mode:"fixed",FixedPositions:Constellation});
+		StarScatter.arrange();
+	}
+
+	var Options =
+		{ InitialMode     : "random"
+		, Mode            : "fixed"
+		, FixedPositions  : Constellations.Orion
+		, FixedRelativeTo : 'corner'
+		, Scale           : 0.5
+		, Shuffle         : true
+		, ChildEvents     : {click:void 0}
+		, ContainerEvents : {click:void 0}
+		};
+
+	var StarScatter = new Scatter(Sky,Options);
+
+</script>

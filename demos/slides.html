@@ -1,0 +1,96 @@
+<!-- Scatter v0.1 | (c) Peter Boughton | License: LGPLv3 | https://www.sorcerersisle.com/software/scatter -->
+<!doctype html><meta charset=utf-8 />
+<title>Slides Scatter Demo</title>
+
+<h1>Slides Scatter Demo</h1>
+<p>Mimicking a spread of 24mm slide negatives, using grid mode with slight rotation.
+<p>Click on a slide to select, click background to discard, click right/left side for next/prev.
+
+<p><i>(View source to see markup, script and CSS used.)</i>
+<script src="../scatter.js"></script>
+
+
+<style>
+	body
+	{
+		font-family:sans-serif;
+		background:#EEE;
+	}
+
+	#SlidesArea
+	{
+		width:  750px;
+		height: 500px;
+		background: #DDD;
+		border: solid 1px black;
+	}
+
+	.slide
+	{
+		width:102px;
+		height:102px;
+		border-radius:6px;
+		background: rgba(255,252,246,1);
+		box-shadow: 0 0 5px rgba(0,0,0,0.1);
+		cursor: pointer;
+		transition: 0.3s;
+	}
+
+	.slide.selected
+	{
+		box-shadow: 0 0 5px rgba(48,48,48,0.5);
+	}
+
+	.slide img
+	{
+		display:block;
+		width:72px;
+		height:48px;
+		margin:27px auto;
+		padding:0;
+		background:black;
+	}
+</style>
+
+
+<div id="SlidesArea"></div>
+
+
+<script>
+	var Container = document.getElementById('SlidesArea');
+
+	for ( var i = 1 ; i <= 24 ; ++i )
+		Container.innerHTML += '<div class="slide"><img /></div>';
+
+	var Options =
+		{ Mode            : 'grid'
+		, InitialMode     : 'grid'
+		, SelectedScale   : 4
+		, MaxRotation     : 3
+		, GridSpacingX    : 15
+		, GridSpacingY    : 15
+		, ChildEvents     : {click:selectOrNavigate}
+		, ContainerEvents : {click:'discard',dblclick:'arrange'}
+		};
+
+	var SlideScatter = new Scatter(Container,Options);
+
+
+	function selectOrNavigate(event)
+	{
+		event.stopPropagation();
+
+		if ( event.currentTarget.classList.contains('selected') )
+		{
+			if ( event.offsetX > event.currentTarget.offsetWidth/2 )
+				SlideScatter.next();
+			else
+				SlideScatter.prev();
+		}
+		else
+		{
+			SlideScatter.select(event.currentTarget);
+		}
+	}
+
+</script>

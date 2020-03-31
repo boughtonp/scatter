@@ -1,0 +1,219 @@
+<!-- Scatter v0.1 | (c) Peter Boughton | License: LGPLv3 | https://www.sorcerersisle.com/software/scatter -->
+<!doctype html><meta charset=utf-8 />
+<title>Cards Scatter Demo</title>
+
+<h1>Cards Scatter Demo</h1>
+<p>A full deck of playing cards strewn across a table.
+<p>Uses random mode plus <em>not</em> setting overflow:hidden style on the container to allow cards to overlap the edge.
+<p>Click to flip a card - uses custom handler for click event to modify the CSS transform.
+<p>Each individual card uses Scatter too - pre-defined pip coordinates are passed to a fixed mode Scatter instance with click events disabled.
+
+<p><i>(View source to see markup, script and CSS used.)</i>
+<script src="../scatter.js"></script>
+
+
+<style>
+	body
+	{
+		font-family:sans-serif;
+		background:#CCC;
+	}
+
+	#Table
+	{
+		display:block;
+		background:#484;
+		border: solid 1px black;
+		width:960px;
+		margin:auto;
+		height:480px;
+		margin-top:4em;
+	}
+
+	#Table>*
+	{
+		transition: 0.3s;
+	}
+
+	.card
+	{
+		position:relative;
+		display: inline-block;
+		background: white;
+		border: solid 2px white;
+		border-radius: 9px;
+		height: 342px; /* 3.5in ~ 346px */
+		width: 236px; /* 2.5in ~ 240px */
+		box-shadow: 0 0 2px rgba(0,0,0,0.2);
+
+		font-family: serif;
+		text-align:center;
+	}
+	.card.hearts,.card.diams { color: red; }
+	.card.spades,.card.clubs { color: black; }
+
+	.card .inv{ transform: rotate(180deg); }
+
+	.card .corner
+	{
+		width: 30px;
+		font-size: 34px;
+		line-height: 1;
+		position: absolute;
+	}
+	.card .corner:not(.inv){left:0;top:0;}
+	.card .corner.inv{right:0;bottom:0;}
+
+	.card .body
+	{
+		width:100%;
+		height:100%;
+		font-size:80px;
+	}
+
+	/* Larger pip for Ace of Spades */
+	.card.spades.v1 .body
+	{
+		font-size: 160px;
+		margin-top:-20px;
+	}
+
+
+	.card .body.picture
+	{
+		margin: 22px auto;
+		padding: 4px 0;
+		width:176px;
+		height:282px;
+		border:solid 1px navy;
+		background:#FFE;
+	}
+
+	.card.facedown
+	{
+		background-color: white;
+		background-image: radial-gradient(circle,white,navy 6px,white 12px,white);
+		background-size: 18px 20px;
+	}
+	.card.facedown>*
+	{
+		display:none;
+	}
+</style>
+
+
+<div id="Table"></div>
+
+
+<script>
+	var Suits = ['spades','hearts','clubs','diams'];
+	var Labels = {  1:'A' , 11:'J' , 12:'Q' , 13:'K' , 10:'1<span style="margin-left:-0.4ch;">0</span>' };
+
+	var Ends       = 126;
+	var Sides      = 54;
+	var Corners    = [[-Sides,-Ends],[Sides,-Ends],[-Sides,Ends,180],[Sides,Ends,180]];
+	var MidRow     = [[-Sides,0],[Sides,0]];
+	var NineTen    = [[-Sides,-48],[Sides,-48],[-Sides,48,180],[Sides,48,180]];
+	var Pictures   = [[-Sides,-Ends],[Sides,Ends,180],[0,-Ends+30],[0,Ends-30,180],[0,-Ends+60],[0,Ends-60,180]];
+
+	var Hats = {11:'&#9815;',12:'&#9813;',13:'&#9818;'};
+
+	var PipPositions =
+		{ 1:  [[0,0]]
+		, 2:  [[0,-Ends],[0,Ends,180]]
+		, 3:  [[0,0],[0,-Ends],[0,Ends,180]]
+		, 4:  Corners
+		, 5:  Corners.concat([[0,0]])
+		, 6:  Corners.concat(MidRow)
+		, 7:  Corners.concat(MidRow).concat([[0,-68]])
+		, 8:  Corners.concat(MidRow).concat([[0,-68],[0,68,180]])
+		, 9:  Corners.concat(NineTen).concat([[0,0]])
+		, 10: Corners.concat(NineTen).concat([[0,-87],[0,87,180]])
+		, 11: Pictures
+		, 12: Pictures
+		, 13: Pictures
+		};
+
+
+	function renderCard(Value,Suit)
+	{
+		var SuitHtml = '&'+Suit+';';
+
+		var Label = Labels[Value] || Value;
+
+		var CardHtml = '<div class="card '+Suit+' v'+Value+'">'
+			+'<div class="corner"><div class="value">'+Label+'</div><div class="suit">'+SuitHtml+'</div></div>'
+			;
+
+		if ( Value > 10 )
+		{
+			CardHtml += '<div class="body picture">'
+				+ '<div class="pip">'+SuitHtml+'</div><div class="pip">'+SuitHtml+'</div>'
+				+ '<div class="hat">'+Hats[Value]+'</div><div class="hat">'+Hats[Value]+'</div>'
+				+ '<div class="head">&#9786;</div><div class="head">&#9786;</div>'
+				+ '</div>'
+				;
+		}
+		else
+		{
+			CardHtml += '<div class="body">';
+			for ( var i = 1 ; i <= Value ; ++i )
+				CardHtml += '<div class="pip">'+SuitHtml+'</div>';
+			CardHtml += '</div>';
+		}
+
+		CardHtml += '<div class="corner inv"><div class="value">'+Label+'</div><div class="suit">'+SuitHtml+'</div></div>'
+			+'</div>';
+
+		return CardHtml;
+	}
+
+	/*
+		render each card and positions pips using
+	*/
+	var Table = document.getElementById('Table');
+	for ( var i=0 ; i<Suits.length ; ++i )
+	{
+		for ( var Value = 1 ; Value <= 13 ; ++Value )
+		{
+			Table.innerHTML += renderCard(Value,Suits[i]);
+
+			var CardOptions =
+				{ InitialMode     : 'fixed'
+				, FixedRelativeTo : 'center'
+				, FixedPositions  : PipPositions[Value]
+				, ChildEvents     : {'click':void 0}
+				, ContainerEvents : {'click':void 0}
+				};
+
+			new Scatter('.card.v'+Value+'.'+Suits[i]+' .body',CardOptions );
+		}
+	}
+
+	function flipCard(event)
+	{
+		event.stopPropagation();
+		event.currentTarget.classList.toggle('facedown');
+
+		if ( event.currentTarget.style.transform.indexOf('rotate3d') !== -1 )
+		{
+			event.currentTarget.style.transform = event.currentTarget.style.transform.replace(/rotate3d\([^)]+\)/,'');
+		}
+		else
+		{
+			// non-zero z rotation overcomes animation glitch when card has clockwise 2d rotation.
+			event.currentTarget.style.transform += ' rotate3d(0,1,0.001,180deg)';
+		}
+	}
+
+	var CardOptions =
+		{ Mode        : 'random'
+		, InitialMode : 'random'
+		, Scale       : 0.3
+		, MaxRotation : 45
+		, Shuffle     : true
+		, ChildEvents : {click:flipCard}
+		};
+	var CardScatter = new Scatter(document.getElementById('Table'),CardOptions);
+
+</script>
