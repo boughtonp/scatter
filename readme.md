@@ -1,10 +1,10 @@
 Scatter
 
-* Version:       0.1
+* Version:       0.1.1
 * License:       LGPLv3
 * Homepage:      https://www.sorcerersisle.com/software/scatter
 * Documentation: https://docs.sorcerersisle.com/scatter
-* Repository:    https://github.com/boughtonp/scatter.git
+* Repository:    https://code.sorcerersisle.com/scatter.git
 * Issues:        https://github.com/boughtonp/scatter/issues
 
 
@@ -20,7 +20,7 @@ as using decorative images to provide a randomized background, or any other
 reasons for scattering items your imagination can come up with.
 
 The demos directory provides various examples showing how to achieve different
-effects. For further detail on how Scatter works, check the docs directory.
+effects. For further detail on how Scatter works, check the docs.pdf file.
 
 
 Requirements
